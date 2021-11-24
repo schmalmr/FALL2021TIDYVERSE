@@ -256,6 +256,13 @@ Initial Description and Link:
 
 Revision/Addition Description and Link:
 
+Extended the original file that Charles Ugiagbe created.
+607 Tidyverse Extend includes additional examples to several of the features provided in the original, additional ggplot2 plot types.  Use of feature in purr compared to more standard method to calculated mean and standard deviaiton.  Use of linear model with the data in a couple different manners. Added to graphic was the use of geom_smooth to include linear model line. [Ugiabe_Schmalfeld_DATA607_Tidyverse_Extend_Assigmt.pdf](https://github.com/acatlin/FALL2021TIDYVERSE/files/7598596/Ugiabe_Schmalfeld_DATA607_Tidyverse_Extend_Assigmt.pdf)
+
+
+https://github.com/schmalmr/607_Fall2021_Tidyverse_Extend
+
+http://rpubs.com/schmalmr/a839422
 
 # Mathew M
 Initial Description and Link:
