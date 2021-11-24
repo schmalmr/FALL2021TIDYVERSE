@@ -256,6 +256,15 @@ Initial Description and Link:
 
 Revision/Addition Description and Link:
 
+607 Tidyverse Extend
+
+The extends the original tidyverse create project that Charles Ugiagbe completed on 10/23 by extending some of the 
+examples for the existing cases for ggplot2, adding some examples of purr function compared to traditional option and use of linear model example (stand alone and added to graphics with geom_smooth.
+
+https://github.com/schmalmr/607_Fall2021_Tidyverse_Extend
+
+http://rpubs.com/schmalmr/a839422
+
 
 # Mathew M
 Initial Description and Link:
