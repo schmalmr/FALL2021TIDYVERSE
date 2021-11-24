@@ -1,0 +1,265 @@
+---
+title: "TidyVerse Create and Extend Vignette"
+output:
+  pdf_document: 
+    toc: yes
+    latex_engine: xelatex
+  word_document:
+    toc: yes
+  html_document:
+    theme: cerulean
+    toc: yes
+    toc_float: yes
+---
+
+### Title: "CUNY SPS MDS DATA607_Tyderverse Create & Extend"
+### Author: "Charles Ugiagbe (create) and Mark Schmalfeld (extend)"
+### Date: "11/23/2021"
+
+
+```{r global_options, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<style>
+div.aquamarine { background-color:#d9eff9; border-radius: 10px; padding: 5px;}
+</style>
+<div class = "aquamarine">
+
+
+## Introduction
+
+Tidyverse is just a collection of R packages underlying same design philosophy, grammar, and data structure. There are currently 8 packages in the `tidyverse` package bundle including:
+
+  * `dplyr`: a set of tools for efficiently manipulating datasets;
+  * `forcats`: a package for manipulating categorical variables / factors;
+  * `ggplots2`: a classic package for data visualization;
+  * `purrr`: another set of tools for manipulating datasets, specially vecters, a complement to `dplyr`;
+  * `readr`: a set of faster and more user friendly functions to read data than R default functions;
+  * `stringr`: a package for common string operations;
+  * `tibble`：a package for reimagining data.frames in a modern way;
+  * `tidyr`: a package for reshaping data, a complement to `dplyr`.
+  
+
+</div> \hfill\break  
+  
+**In this assignment, I will use some handy functions in tidyverse package to perform some Analysis**
+
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+##       Dataset
+
+The dataset in this project is called “student performance” from https://www.kaggle.com/datasets; The dataset contains a sample of 1000 observations of 8 variables.
+
+
+I use `read.csv` function to import the csv file to R.
+
+```{r}
+url <- "https://raw.githubusercontent.com/omocharly/DATA607_PROJECTS/main/StudentsPerformance.csv"
+data <- read.csv(url, header = TRUE)
+```
+
+
+```{r data header}
+head(data)
+```
+
+Glimpse help us to catch sight of the data to see the data structure.
+
+```{r glimpse data}
+glimpse(data)
+```
+
+##   dplyr::rename()
+
+rename() changes the names of individual variables using in a column with a new one
+
+
+```{r rename col}
+data1 <- data %>% rename(race = race.ethnicity, parental_Educatn_level= parental.level.of.education, test.prep = test.preparation.course)
+head(data1)
+```
+
+##   dplyr::select()
+
+Select(): is use for selecting a range of consecutive variables or taking the complement of a set of variables
+
+```{r selection initial example}
+data2 <- data1 %>%
+  select(gender, math.score, reading.score, writing.score)
+head(data2)
+```
+```{r select examples}
+data2b<- data1 %>%
+  select( gender,test.prep,math.score,reading.score,writing.score)
+head(data2b)
+tail(data2b)
+```
+
+
+
+##   dplyr::filter()
+
+I use the filter() function to filter maths, writing and reading scores that are greater than 95
+
+```{r filter examples}
+data3 <- data2 %>%
+  filter(math.score == 100, writing.score > 95, reading.score > 95)
+data3
+```
+
+
+##    dplyr::arrange()
+
+arrange(): orders the rows of a data frame by the values of selected columns.
+
+```{r arrange examples}
+data4 <- data2 %>% arrange(desc(math.score))
+head(data4)
+```
+
+##    dplyr::mutate() 
+
+mutate() adds new variables that are function of the existing ones to the table and also preserves existing ones.
+
+```{r mutate examples}
+data5 <- data4 %>%
+  mutate(avg.score = (math.score + writing.score + reading.score) / 3)
+head(data5)
+
+data5<- data5 %>%
+  mutate(avg.read_write_score =(writing.score+reading.score)/2)
+head(data5)
+
+```
+
+## dplyr::case_when() 
+Case_when: Function allows you to vectorize multiple if_else() statements. It is an R equivalent of a SQL CASE WHEN statement. 
+
+```{r data mutate}
+data6 <- data5 %>% 
+  mutate(pass_fail_grade = case_when(avg.score >= 85 ~ 'Pass'
+                                     ,TRUE ~ 'Fail' )
+         )
+head(data6)
+```
+
+##    dplyr::summarize() 
+
+```{r ggplot summarize}
+data %>% group_by(gender) %>%
+  summarize( math_score = sum (math.score)/ n())
+
+data %>% group_by(parental.level.of.education) %>%
+  summarize(math_score= sum(math.score)/n())
+
+```
+
+##    Tidyverse::ggplot2()
+
+ggplot2 is a system for 'declaratively' creating graphics, based on "The Grammar of Graphics".
+
+```{r distribution plot}
+ggplot(data = data6, aes(x = gender, y = avg.score, col = gender), col = red) + geom_boxplot() + labs(title="Distribution of Students Average score") + theme(plot.title = element_text(hjust=0.5))
+```
+
+
+##### ggplot2 system has many different plot designs that you can create using the appropriate geom_type for the plot.  Below are two simple examples to create a scatter plot evaluation the relationship between reading and math scores by gender (with linear correlation model line using geom_smooth) and a histogram plot of the math scores.
+
+```{r ggplot2 scatter plot with smooth line and histogram}
+ggplot(data = data1, aes(x = reading.score, y= math.score, col = gender), col = red) + geom_point() + labs(title="Scatter plot of math score vs reading score by student gender") + theme(plot.title = element_text(hjust=0.5))+geom_smooth(method=lm)
+
+ggplot(data = data1, aes(x = math.score), col = red) + geom_histogram(binwidth = 5) + labs(title="Histogram of math scores") + theme(plot.title = element_text(hjust=0.5))
+
+```
+
+
+
+##   map() function use from purrr 
+ 
+Use of the purr Map function to calculate the mean vs a traditional approach.
+
+
+```{r traditional mean calculation for scores and in this case example is filtered by gender}
+data3a<-data2 %>%
+  filter(gender== "female",math.score>0, writing.score >95, reading.score >95)
+data3a
+data3b<-data2 %>%
+  filter(gender == "male", math.score>0, writing.score >95, reading.score >95)
+data3b
+
+
+paste0 (" The average female math score is ", (mean(data3a$math.score))) 
+paste0 (" The average male math score is ", (mean(data3b$math.score)))
+
+
+```
+
+
+```{r use of map() capability to calculate mean and standard deviation}
+
+data2a <- data1 %>%
+  select(math.score, reading.score, writing.score)
+head(data2a)
+
+paste0 ("The mean math score, reading score and writing score")
+map_dbl (data2a, mean)
+paste0 ("The stardard deviaiton for math, reading and writing scores")
+map_dbl(data2a, sd)
+
+
+```
+##  purrr models short cut to evaluate a correlation
+
+Use of Purr for models and to evaluate the model correlation 
+
+```{r models evaluation with purrr }
+
+models<- data1 %>%
+  split(.$gender) %>%
+  map(~lm (math.score ~ reading.score, data= .))
+
+models %>%
+ map(summary) %>% 
+ map_dbl(~.$r.squared)
+
+
+
+models2<- data %>%
+  split(.$parental.level.of.education) %>%
+  map(~lm (math.score ~ reading.score, data= .))
+
+models2 %>%
+ map(summary) %>% 
+ map_dbl(~.$r.squared)
+
+
+
+
+
+
+```
+
+## dyplr  unite() to merge different character columns 
+
+Use of unite() function to merge character columns. 
+Merge - gender, level of education and race/ ethnicity.
+
+
+```{r create a united set of character columns under new column "Merged"}
+
+
+data<- data %>%
+  unite("Merged", parental.level.of.education:gender, remove=FALSE)
+head (data)
+
+
+```
+
+
+
+
+**Other usage of Tidyverse can be found in the textbook "R for Data Science" and other online resource.**
